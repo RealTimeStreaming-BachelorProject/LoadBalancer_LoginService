@@ -1,0 +1,22 @@
+{
+  "name": "loadbalancer_loginservice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RealTimeStreaming-BachelorProject/LoadBalancer_LoginService.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RealTimeStreaming-BachelorProject/LoadBalancer_LoginService/issues"
+  },
+  "homepage": "https://github.com/RealTimeStreaming-BachelorProject/LoadBalancer_LoginService#readme",
+  "dependencies": {
+    "http-proxy": "^1.18.1"
+  }
+}

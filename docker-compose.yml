@@ -1,0 +1,69 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      POSTGRES_USER: loginservice
+      POSTGRES_PASSWORD: Loginservice_database_password1
+      POSTGRES_DB: loginservice-database
+    deploy:
+      resources:
+        limits:
+          cpus: 2
+          memory: 1G
+    ports:
+      - 5432:5432
+    volumes:
+      # Inside postgres we can specify sql script which is run in alphabetical order. This script creates the database
+      - "./blankdatabasestartup.sql:/docker-entrypoint-initdb.d/init.sql"
+
+  loginservice1:
+    image: omvk97/bachelorloginservice
+    container_name: loginservice1
+    deploy:
+      resources:
+        limits:
+          cpus: 0.5
+          memory: 256M
+    environment:
+      LOGINSERVICE_POSTGRES_CONNECTION_STRING: "Host=postgres;Port=5432;Database=loginservice-database;Username=loginservice;Password=Loginservice_database_password1"
+      LOGINSERVICE_PORT: 5005
+      LOGINSERVICE_JWT_ISSUER: "https://localhost:5005"
+      LOGINSERVICE_JWT_KEY: "developmentjwtkey"
+    ports:
+      - 5005:5005
+    depends_on:
+      - postgres
+
+  loginservice2:
+    image: omvk97/bachelorloginservice
+    container_name: loginservice2
+    deploy:
+      resources:
+        limits:
+          cpus: 0.5
+          memory: 256M
+    ports:
+      - 5006:5005
+    environment:
+      LOGINSERVICE_POSTGRES_CONNECTION_STRING: "Host=postgres;Port=5432;Database=loginservice-database;Username=loginservice;Password=Loginservice_database_password1"
+      LOGINSERVICE_PORT: 5005
+      LOGINSERVICE_JWT_ISSUER: "https://localhost:5005"
+      LOGINSERVICE_JWT_KEY: "developmentjwtkey"
+    depends_on:
+      - postgres
+
+  loadbalancer:
+    image: omvk97/loadbalancerloginservice
+    container_name: loadbalancer_loginservice
+    depends_on:
+      - loginservice1
+      - loginservice2
+    environment:
+      SERVERS: '[{"host":"loginservice1", "port":"5005"}]'
+      # SERVERS: '[{"host":"loginservice1", "port":"5005"}, {"host":"loginservice2", "port":"5005"}]'
+      PORT: 4000
+    ports:
+      - 4000:4000
